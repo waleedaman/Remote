@@ -6,6 +6,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.graphics.PixelFormat
+import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import android.view.*
@@ -14,12 +15,19 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.OvershootInterpolator
 import androidx.annotation.Nullable
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.DataOutputStream
-
+import io.ktor.application.*
+import io.ktor.http.cio.websocket.*
+import io.ktor.server.engine.*
+import io.ktor.websocket.*
+import java.time.Duration
+import io.ktor.routing.*
+import io.ktor.server.netty.*
 
 class FloatingWidgetService : Service() {
     private var mWindowManager: WindowManager? = null
@@ -39,10 +47,24 @@ class FloatingWidgetService : Service() {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate() {
         super.onCreate()
         context = this
+        embeddedServer(Netty, 4444) {
+            install(WebSockets) {
+                pingPeriod = Duration.ofSeconds(60) // Disabled (null) by default
+                timeout = Duration.ofSeconds(15)
+                maxFrameSize = Long.MAX_VALUE // Disabled (max value). The connection will be closed if surpassed this length.
+                masking = false
+            }
+            routing {
+                webSocket("/") {
+                    // ...
+                }
+            }
+        }.start()
         setTheme(R.style.AppTheme)
         Log.d("Service", "onCreate")
         mOverlayView = LayoutInflater.from(this).inflate(R.layout.overlay_layout, null)
@@ -158,7 +180,7 @@ class FloatingWidgetService : Service() {
             val thread = Thread {
                 try {
                     var inst = Instrumentation()
-                    inst.sendKeyDownUpSync(KeyEvent.KEYCODE_S);
+                    inst.sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_CENTER);
 //                    var p = Runtime.getRuntime().exec("su")
 //                    val dos = DataOutputStream(p.outputStream)
 //                    dos.writeBytes("input keyevent " + KeyEvent.KEYCODE_BACK+"\n")
