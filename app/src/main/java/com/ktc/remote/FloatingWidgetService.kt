@@ -14,6 +14,7 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.OvershootInterpolator
+import android.widget.Toast
 import androidx.annotation.Nullable
 import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -28,6 +29,7 @@ import io.ktor.websocket.*
 import java.time.Duration
 import io.ktor.routing.*
 import io.ktor.server.netty.*
+import io.ktor.util.Identity.decode
 
 class FloatingWidgetService : Service() {
     private var mWindowManager: WindowManager? = null
@@ -60,8 +62,21 @@ class FloatingWidgetService : Service() {
                 masking = false
             }
             routing {
-                webSocket("/") {
-                    // ...
+                webSocket("/test") {
+                    send("You are connected!")
+                    for(frame in incoming) {
+                        frame as? Frame.Text ?: continue
+                        val receivedText = frame.readText()
+                        Toast.makeText(this@FloatingWidgetService,receivedText,Toast.LENGTH_SHORT).show()
+                    }
+                }
+                webSocket("/command") {
+                    for(frame in incoming) {
+                        frame as? Frame.Text ?: continue
+                        val receivedText = frame.readText()
+                        Toast.makeText(this@FloatingWidgetService,receivedText,Toast.LENGTH_SHORT).show()
+                    }
+                    send("ack")
                 }
             }
         }.start()
