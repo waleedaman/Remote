@@ -24,13 +24,15 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = '11'
     }
 
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    packagingOptions {
+        exclude 'META-INF/*'
     }
 }
 
@@ -49,4 +51,6 @@ dependencies {
     implementation "io.ktor:ktor-server-netty:1.6.1"
     implementation "io.ktor:ktor-websockets:1.6.1"
     implementation "ch.qos.logback:logback-classic:1.2.3" // for logging
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-native-mt'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0-native-mt'
 }

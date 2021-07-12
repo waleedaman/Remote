@@ -75,6 +75,15 @@ class FloatingWidgetService : Service() {
                         frame as? Frame.Text ?: continue
                         val receivedText = frame.readText()
                         Toast.makeText(this@FloatingWidgetService,receivedText,Toast.LENGTH_SHORT).show()
+                        val thread = Thread {
+                            try {
+                                var inst = Instrumentation()
+                                inst.sendKeyDownUpSync(11);
+                            }catch (e: Exception) {
+                                Log.e("Exception", e.toString())
+                            }
+                        }
+                        thread.start();
                     }
                     send("ack")
                 }
