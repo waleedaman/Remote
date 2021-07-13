@@ -54,38 +54,33 @@ class FloatingWidgetService : Service() {
     override fun onCreate() {
         super.onCreate()
         context = this
-        embeddedServer(Netty, 4444) {
-            install(WebSockets) {
-                pingPeriod = Duration.ofSeconds(60) // Disabled (null) by default
-                timeout = Duration.ofSeconds(15)
-                maxFrameSize = Long.MAX_VALUE // Disabled (max value). The connection will be closed if surpassed this length.
-                masking = false
-            }
+        embeddedServer(Netty, 8080) {
+            install(WebSockets)
             routing {
-                webSocket("/test") {
-                    send("You are connected!")
+                webSocket("/") {
+                    send(Frame.Text("You are connected!"))
                     for(frame in incoming) {
                         frame as? Frame.Text ?: continue
                         val receivedText = frame.readText()
-                        Toast.makeText(this@FloatingWidgetService,receivedText,Toast.LENGTH_SHORT).show()
+                        Log.d("service", receivedText)
                     }
                 }
                 webSocket("/command") {
                     for(frame in incoming) {
                         frame as? Frame.Text ?: continue
                         val receivedText = frame.readText()
-                        Toast.makeText(this@FloatingWidgetService,receivedText,Toast.LENGTH_SHORT).show()
+                        Log.d("service","command: $receivedText")
                         val thread = Thread {
                             try {
-                                var inst = Instrumentation()
-                                inst.sendKeyDownUpSync(11);
+                                val inst = Instrumentation()
+                                inst.sendKeyDownUpSync(receivedText.toInt());
                             }catch (e: Exception) {
                                 Log.e("Exception", e.toString())
                             }
                         }
                         thread.start();
                     }
-                    send("ack")
+                    send(Frame.Text("ack"))
                 }
             }
         }.start()
