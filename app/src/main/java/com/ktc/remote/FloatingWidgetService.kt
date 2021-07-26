@@ -23,18 +23,23 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.DataOutputStream
 import io.ktor.application.*
+import io.ktor.features.*
+import io.ktor.gson.*
+import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
+import io.ktor.response.*
 import io.ktor.server.engine.*
 import io.ktor.websocket.*
 import java.time.Duration
 import io.ktor.routing.*
+import io.ktor.server.cio.*
 import io.ktor.server.netty.*
 import io.ktor.util.Identity.decode
 
 class FloatingWidgetService : Service() {
     private var mWindowManager: WindowManager? = null
     private var mOverlayView: View? = null
-    var Fab: FloatingActionButton? = null
+    private var Fab: FloatingActionButton? = null
     private lateinit var upbtn:MaterialButton
     private var disableTouch:Boolean = false
     private lateinit var context:Context
@@ -54,6 +59,17 @@ class FloatingWidgetService : Service() {
     override fun onCreate() {
         super.onCreate()
         context = this
+        embeddedServer(CIO, 8008) {
+            install(ContentNegotiation) {
+                gson {}
+            }
+            routing {
+                get("/") {
+                    call.respondText("Hello World!", ContentType.Text.Plain)
+                    print("request received")
+                }
+            }
+        }.start(wait = false)
         embeddedServer(Netty, 8080) {
             install(WebSockets)
             routing {

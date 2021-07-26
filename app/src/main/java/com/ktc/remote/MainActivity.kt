@@ -47,7 +47,7 @@ class MainActivity : FragmentActivity() {
         askForSystemOverlayPermission()
 
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this@MainActivity)) {
+        if (Settings.canDrawOverlays(this@MainActivity)) {
             startService(Intent(this@MainActivity, FloatingWidgetService::class.java))
         } else {
             errorToast()
