@@ -23,18 +23,30 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.DataOutputStream
 import io.ktor.application.*
+import io.ktor.client.features.json.*
 import io.ktor.features.*
 import io.ktor.gson.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
+import io.ktor.http.content.*
 import io.ktor.response.*
 import io.ktor.server.engine.*
 import io.ktor.websocket.*
-import java.time.Duration
 import io.ktor.routing.*
 import io.ktor.server.cio.*
 import io.ktor.server.netty.*
-import io.ktor.util.Identity.decode
+import io.ktor.html.*
+import io.ktor.request.*
+import io.ktor.util.cio.*
+import kotlinx.html.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import org.json.JSONObject
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+
+data class Command(val comm:String)
 
 class FloatingWidgetService : Service() {
     private var mWindowManager: WindowManager? = null
@@ -59,14 +71,186 @@ class FloatingWidgetService : Service() {
     override fun onCreate() {
         super.onCreate()
         context = this
+        copyWebResources()
         embeddedServer(CIO, 8008) {
             install(ContentNegotiation) {
-                gson {}
+                gson {
+                    setPrettyPrinting()
+                }
             }
             routing {
+                static("static") {
+                    files(filesDir)
+                }
                 get("/") {
-                    call.respondText("Hello World!", ContentType.Text.Plain)
-                    print("request received")
+                    val html = assets.open("files/index.html").bufferedReader()
+                        .use {
+                            it.readText()
+                        }
+                    print(html);
+                    call.respondText(html, ContentType.Text.Html)
+                }
+                post("/comm") {
+                    when (call.receive<String>()) {
+                        "back" -> {
+                            println("back")
+                            val thread = Thread {
+                                try {
+                                    val inst = Instrumentation()
+                                    inst.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK );
+                                } catch (e: Exception) {
+                                    Log.e("Exception", e.toString())
+                                }
+                            }
+                            thread.start()
+                            call.respondText("post received", contentType =
+                            ContentType.Text.Plain)
+                        }
+                        "home" -> {
+                            println("home")
+                            val thread = Thread {
+                                try {
+                                    val inst = Instrumentation()
+                                    inst.sendKeyDownUpSync(KeyEvent.KEYCODE_HOME );
+                                } catch (e: Exception) {
+                                    Log.e("Exception", e.toString())
+                                }
+                            }
+                            thread.start()
+                            call.respondText("post received", contentType =
+                            ContentType.Text.Plain)
+                        }
+                        "menu" -> {
+                            println("menu")
+                            val thread = Thread {
+                                try {
+                                    val inst = Instrumentation()
+                                    inst.sendKeyDownUpSync(KeyEvent.KEYCODE_MENU );
+                                } catch (e: Exception) {
+                                    Log.e("Exception", e.toString())
+                                }
+                            }
+                            thread.start()
+                            call.respondText("post received", contentType =
+                            ContentType.Text.Plain)
+                        }
+                        "vol+" -> {
+                            println("vol+")
+                            val thread = Thread {
+                                try {
+                                    val inst = Instrumentation()
+                                    inst.sendKeyDownUpSync(KeyEvent.KEYCODE_VOLUME_UP );
+                                } catch (e: Exception) {
+                                    Log.e("Exception", e.toString())
+                                }
+                            }
+                            thread.start()
+                            call.respondText("post received", contentType =
+                            ContentType.Text.Plain)
+                        }
+                        "vol-" -> {
+                            println("vol-")
+                            val thread = Thread {
+                                try {
+                                    val inst = Instrumentation()
+                                    inst.sendKeyDownUpSync(KeyEvent.KEYCODE_VOLUME_DOWN);
+                                } catch (e: Exception) {
+                                    Log.e("Exception", e.toString())
+                                }
+                            }
+                            thread.start()
+                            call.respondText("post received", contentType =
+                            ContentType.Text.Plain)
+                        }
+                        "mute" -> {
+                            println("mute")
+                            val thread = Thread {
+                                try {
+                                    val inst = Instrumentation()
+                                    inst.sendKeyDownUpSync(KeyEvent.KEYCODE_VOLUME_MUTE );
+                                } catch (e: Exception) {
+                                    Log.e("Exception", e.toString())
+                                }
+                            }
+                            thread.start()
+                            call.respondText("post received", contentType =
+                            ContentType.Text.Plain)
+                        }
+                        "up" -> {
+                            println("up")
+                            val thread = Thread {
+                                try {
+                                    val inst = Instrumentation()
+                                    inst.sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_UP );
+                                } catch (e: Exception) {
+                                    Log.e("Exception", e.toString())
+                                }
+                            }
+                            thread.start()
+                            call.respondText("post received", contentType =
+                            ContentType.Text.Plain)
+                        }
+                        "down" -> {
+                            println("down")
+                            val thread = Thread {
+                                try {
+                                    val inst = Instrumentation()
+                                    inst.sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_DOWN );
+                                } catch (e: Exception) {
+                                    Log.e("Exception", e.toString())
+                                }
+                            }
+                            thread.start()
+                            call.respondText("post received", contentType =
+                            ContentType.Text.Plain)
+                        }
+                        "left" -> {
+                            println("left")
+                            val thread = Thread {
+                                try {
+                                    val inst = Instrumentation()
+                                    inst.sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_LEFT );
+                                } catch (e: Exception) {
+                                    Log.e("Exception", e.toString())
+                                }
+                            }
+                            thread.start()
+                            call.respondText("post received", contentType =
+                            ContentType.Text.Plain)
+                        }
+                        "right" -> {
+                            println("right")
+                            val thread = Thread {
+                                try {
+                                    val inst = Instrumentation()
+                                    inst.sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_RIGHT );
+                                } catch (e: Exception) {
+                                    Log.e("Exception", e.toString())
+                                }
+                            }
+                            thread.start()
+                            call.respondText("post received", contentType =
+                            ContentType.Text.Plain)
+                        }
+                        "ok" -> {
+                            println("ok")
+                            val thread = Thread {
+                                try {
+                                    val inst = Instrumentation()
+                                    inst.sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_CENTER );
+                                } catch (e: Exception) {
+                                    Log.e("Exception", e.toString())
+                                }
+                            }
+                            thread.start()
+                            call.respondText("post received", contentType =
+                            ContentType.Text.Plain)
+                        }
+                        else -> {
+                            call.respondText("unknown command", contentType =
+                            ContentType.Text.Plain)
+                        }
+                    }
                 }
             }
         }.start(wait = false)
@@ -438,4 +622,20 @@ class FloatingWidgetService : Service() {
         super.onDestroy()
         if (mOverlayView != null) mWindowManager!!.removeView(mOverlayView)
     }
+
+    private fun copyWebResources() {
+        val files = assets.list("files")
+        Toast.makeText(context,"Hello",Toast.LENGTH_LONG).show()
+        files?.forEach { path ->
+            println("Path: $path")
+            val input = assets.open("files/$path")
+            val outFile = File(filesDir, path)
+            val outStream = FileOutputStream(outFile)
+            outStream.write(input.readBytes())
+            outStream.close()
+            input.close()
+        }
+    }
+
 }
+

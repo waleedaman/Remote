@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Web Remote</title>
+    <link rel="stylesheet" href="static/styles.css"></link>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <link rel="stylesheet" href="static/bootstrap.min.css"></link>
+</head>
+<body>
+    
+    <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-xs d-flex justify-content-center">
+                <nav class="d-pad">
+                  <a class="up" onclick="send('up')"></a>
+                  <a class="right" onclick="send('right')"></a>
+                  <a class="ok" onclick="send('ok')"></a>
+                  <a class="down" onclick="send('down')"></a>
+                  <a class="left" onclick="send('left')"></a>  
+                </nav>
+          </div>
+        </div>
+        <div class="row space justify-content-center">
+          <div class="col-md-3 d-flex justify-content-center">
+              <button type="button" class="btn btn-outline-primary rounded-circle" onclick="send('back')"><i class="fa fa-arrow-left"></i></button>
+          </div>
+          <div class="col-md-3 d-flex justify-content-center">
+              <button class="btn btn-outline-primary rounded-circle" onclick="send('home')"><i class="fa fa-home"></i></button>
+          </div>
+          <div class="col-md-3 d-flex justify-content-center">
+              <button class="btn btn-outline-primary rounded-circle" onclick="send('menu')"><i class="fa fa-bars"></i></button>
+          </div>
+        </div>
+        <div class="row space justify-content-center">
+            <div class="col-md-3 d-flex justify-content-center">
+                <button class="btn btn-outline-primary rounded-circle" onclick="send('vol+')"><i class="fa fa-volume-up"></i></button>
+            </div>
+            <div class="col-md-3 d-flex justify-content-center">
+                <button class="btn btn-outline-primary rounded-circle" onclick="send('mute')"><i class="fa fa-volume-mute"></i></button>
+            </div>
+            <div class="col-md-3 d-flex justify-content-center">
+                <button class="btn btn-outline-primary rounded-circle" onclick="send('vol-')"><i class="fa fa-volume-down"></i></button>
+            </div>
+          </div>
+      </div>
+      
+    <script src="static/jquery-3.6.0.min.js"></script>
+    <script src="static/bootstrap.bundle.min.js"></script>
+    <script>
+        function send(command) {
+            $.ajax({ 
+                url:"/comm",
+                data: command,
+                type:"POST",
+                contentType:"application/text; charset=utf-8",
+                dataType:"json",
+                success: function(){
+                    alert("Sent command");
+                }
+            });
+        }
+        $("button").on("touchstart", function(){ 
+            $(this).removeClass("mobileHoverFix");
+        });
+        $("button").on("touchend", function(){ 
+            alert("touchend");
+            $(this).addClass("mobileHoverFix");
+        });
+        $(".btn").on("click", function() {
+            $(this).blur(); // basically George's solution, but for all BS buttons
+    });
+    </script>    
+    <script src="static/script.js"></script>
+
+</body>
+</html>
