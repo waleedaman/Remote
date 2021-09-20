@@ -49,7 +49,7 @@
     <script src="static/bootstrap.bundle.min.js"></script>
     <script>
         function send(command) {
-            $.ajax({ 
+            $.ajax({
                 url:"/comm",
                 data: command,
                 type:"POST",
@@ -60,16 +60,6 @@
                 }
             });
         }
-        $("button").on("touchstart", function(){ 
-            $(this).removeClass("mobileHoverFix");
-        });
-        $("button").on("touchend", function(){ 
-            alert("touchend");
-            $(this).addClass("mobileHoverFix");
-        });
-        $(".btn").on("click", function() {
-            $(this).blur(); // basically George's solution, but for all BS buttons
-    });
     </script>    
     <script src="static/script.js"></script>
 

@@ -72,7 +72,16 @@ class FloatingWidgetService : Service() {
         super.onCreate()
         context = this
         copyWebResources()
-        embeddedServer(CIO, 8008) {
+        embeddedServer(Netty, 8000) {
+//            install(ContentNegotiation){
+//                gson{}
+//            }
+//            routing{
+//                get("/"){
+//                    call.respondText("HELLO",ContentType.Text.Plain)
+//                }
+//            }
+//        }
             install(ContentNegotiation) {
                 gson {
                     setPrettyPrinting()
@@ -286,7 +295,7 @@ class FloatingWidgetService : Service() {
         }.start()
         setTheme(R.style.AppTheme)
         Log.d("Service", "onCreate")
-        mOverlayView = LayoutInflater.from(this).inflate(R.layout.overlay_layout, null)
+        mOverlayView = LayoutInflater.from(context).inflate(R.layout.overlay_layout, null)
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -300,8 +309,8 @@ class FloatingWidgetService : Service() {
 
         alpha.fillAfter = true // Tell it to persist after the animation ends
 
-        animShow = AnimationUtils.loadAnimation(this, R.anim.view_show);
-        animHide = AnimationUtils.loadAnimation(this, R.anim.view_hide);
+        animShow = AnimationUtils.loadAnimation(context, R.anim.view_show);
+        animHide = AnimationUtils.loadAnimation(context, R.anim.view_hide);
 
         // And then on your layout
         //Specify the view position
